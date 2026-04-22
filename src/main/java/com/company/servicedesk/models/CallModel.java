@@ -13,10 +13,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity(name = "Users") //plural to avoid errors with the postgres
-@Table(name = "tb_users")
+@Entity(name = "Calls")
+@Table(name = "tb_calls")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class UserModel implements Serializable {
+public class CallModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -25,9 +25,5 @@ public class UserModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
-
-    @Column(nullable = false)
-    private String department;
+    
 }
