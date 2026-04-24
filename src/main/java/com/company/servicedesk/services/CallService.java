@@ -58,5 +58,7 @@ public class CallService {
     public void deleteCall(UUID callId) {
         CallModel model = callRepository.findById(callId)
                 .orElseThrow(() -> new RuntimeException("Chamado não encontrado"));
+
+        callRepository.delete(model);
     }
 }
