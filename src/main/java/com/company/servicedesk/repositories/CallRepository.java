@@ -8,6 +8,4 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CallRepository extends JpaRepository<CallModel, UUID> {
-    @NonNull
-    Optional<CallModel> findById(@NonNull UUID id);
 }

@@ -47,4 +47,6 @@ public class CallModel implements Serializable {
     private String solution;
 
     @Column LocalDate endDate;
+
+    @Column CallState callState;
 }
