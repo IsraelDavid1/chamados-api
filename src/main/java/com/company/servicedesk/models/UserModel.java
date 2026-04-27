@@ -26,8 +26,14 @@ public class UserModel implements Serializable {
     private UUID id;
 
     @Column(nullable = false, unique = true)
-    private String name;
+    private String login;
+
+    @Column(nullable = false)
+    private String password;
 
     @Column(nullable = false)
     private String department;
+
+    @Column(nullable = false)
+    private UserRole role;
 }

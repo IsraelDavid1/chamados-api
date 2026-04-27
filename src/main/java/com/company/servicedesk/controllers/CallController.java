@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -39,4 +40,12 @@ public class CallController {
         callService.deleteCall(callId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping
+    public  ResponseEntity<List<CallModel>> getAllCalls(UUID userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getAllCalls(userId));
+    }
+
+    @GetMapping("/{callId}")
+    public ResponseEntity<CallModel> getCall()
 }
