@@ -3,6 +3,7 @@ package com.company.servicedesk.controllers;
 import com.company.servicedesk.dtos.CreateCallDTO;
 import com.company.servicedesk.dtos.CreateCompleteCallDTO;
 import com.company.servicedesk.dtos.FinishCallDTO;
+import com.company.servicedesk.dtos.MonthDTO;
 import com.company.servicedesk.models.CallModel;
 import com.company.servicedesk.services.CallService;
 import jakarta.validation.Valid;
@@ -25,17 +26,17 @@ public class CallController {
         return ResponseEntity.status(HttpStatus.CREATED).body(callService.createCall(data));
     }
 
-    @PatchMapping
-    public ResponseEntity<CallModel> finishCall(@PathVariable UUID calId, @RequestBody @Valid FinishCallDTO data) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(callService.finishCall(calId, data));
+    @PatchMapping("/{callId}")
+    public ResponseEntity<CallModel> finishCall(@PathVariable UUID callId, @RequestBody @Valid FinishCallDTO data) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(callService.finishCall(callId, data));
     }
 
     @PostMapping("/finishedcall")
     public ResponseEntity<CallModel> createFinishedCall(@RequestBody @Valid CreateCompleteCallDTO data) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createFinishedCall(data));
+        return ResponseEntity.status(HttpStatus.OK).body(callService.createFinishedCall(data));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{callId}")
     public ResponseEntity<Void> deleteCall(@PathVariable UUID callId) {
         callService.deleteCall(callId);
         return ResponseEntity.noContent().build();
@@ -47,5 +48,12 @@ public class CallController {
     }
 
     @GetMapping("/{callId}")
-    public ResponseEntity<CallModel> getCall()
+    public ResponseEntity<CallModel> getCall(@PathVariable UUID callId) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getCall(callId));
+    }
+
+    @GetMapping("/mouthly")
+    public  ResponseEntity<List<CallModel>> getCallsByMonth(UUID userId, MonthDTO data) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getCallsByMonth(userId, data));
+    }
 }

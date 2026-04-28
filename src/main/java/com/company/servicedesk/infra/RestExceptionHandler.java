@@ -15,14 +15,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AlreadyFinishedCallException.class)
     public ResponseEntity<RestErrorMessage> alreadyFinishedCallHandler(AlreadyFinishedCallException exception) {
         RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.BAD_REQUEST,
-                "BAD_REQUEST", "Chamado já finalizado!", "/call");
+                "BAD_REQUEST", exception.getMessage(), "/call");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(CallNotFoundException.class)
     public ResponseEntity<RestErrorMessage> callNotFoundHandler(CallNotFoundException exception) {
-        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.BAD_REQUEST,
-                "BAD_REQUEST", "Chamado não encontrado!", "/call");
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.NOT_FOUND,
+                "NOT_FOUND", exception.getMessage(), "/call");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }
