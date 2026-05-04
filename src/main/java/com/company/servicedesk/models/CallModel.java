@@ -31,7 +31,7 @@ public class CallModel implements Serializable {
     private UserModel createdBy;
 
     @ManyToOne
-    @JoinTable(name = "assigned_to")
+    @JoinColumn(name = "assigned_to")
     private UserModel assignedTo;
 
     @Column(nullable = false)
@@ -54,8 +54,10 @@ public class CallModel implements Serializable {
     @Column
     private String solution;
 
-    @Column LocalDate endDate;
+    @Column(nullable = false)
+    private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
-    @Column CallState callState;
+    @Column(nullable = false)
+    private CallState callState = CallState.INCOMPLETE;
 }

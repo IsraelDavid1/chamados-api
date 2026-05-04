@@ -3,7 +3,6 @@ package com.company.servicedesk.services;
 import com.company.servicedesk.dtos.CreateCallDTO;
 import com.company.servicedesk.dtos.CreateCompleteCallDTO;
 import com.company.servicedesk.dtos.FinishCallDTO;
-import com.company.servicedesk.dtos.MonthDTO;
 import com.company.servicedesk.exceptions.AlreadyFinishedCallException;
 import com.company.servicedesk.exceptions.CallNotFoundException;
 import com.company.servicedesk.exceptions.UserNotFoundException;
@@ -103,8 +102,8 @@ public class CallService {
     }
 
     //check userId not implemented
-    public List<CallModel> getCallsByMonth(MonthDTO data) {
-        return callRepository.findByMouth(data.beginDate(), data.lastDate());
+    public List<CallModel> getCallsByMonth(LocalDate beginDate, LocalDate lastDate) {
+        return callRepository.findByMonth(beginDate, lastDate);
     }
 
     public List<CallModel> getAllCalls(UUID userId) {

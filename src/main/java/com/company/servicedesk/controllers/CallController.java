@@ -3,7 +3,6 @@ package com.company.servicedesk.controllers;
 import com.company.servicedesk.dtos.CreateCallDTO;
 import com.company.servicedesk.dtos.CreateCompleteCallDTO;
 import com.company.servicedesk.dtos.FinishCallDTO;
-import com.company.servicedesk.dtos.MonthDTO;
 import com.company.servicedesk.models.CallModel;
 import com.company.servicedesk.services.CallService;
 import jakarta.validation.Valid;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +43,7 @@ public class CallController {
     }
 
     @GetMapping
-    public  ResponseEntity<List<CallModel>> getAllCalls(UUID userId) {
+    public  ResponseEntity<List<CallModel>> getAllCalls(@RequestParam UUID userId) {
         return ResponseEntity.status(HttpStatus.OK).body(callService.getAllCalls(userId));
     }
 
@@ -53,12 +53,12 @@ public class CallController {
     }
 
     @GetMapping("/mycalls")
-    public ResponseEntity<List<CallModel>> getMyCalls(UUID userId) {
+    public ResponseEntity<List<CallModel>> getMyCalls(@RequestParam UUID userId) {
         return ResponseEntity.status(HttpStatus.OK).body(callService.getMyCalls(userId));
     }
 
     @GetMapping("/mouthly")
-    public  ResponseEntity<List<CallModel>> getCallsByMonth(MonthDTO data) {
-        return ResponseEntity.status(HttpStatus.OK).body(callService.getCallsByMonth(data));
+    public  ResponseEntity<List<CallModel>> getCallsByMonth(@RequestParam LocalDate beginDate, @RequestParam LocalDate lastDate) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getCallsByMonth(beginDate, lastDate));
     }
 }

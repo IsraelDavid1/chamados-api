@@ -37,8 +37,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UserWithNoPrivilegeException.class)
     public ResponseEntity<RestErrorMessage> userWithNoPrivilegeHandler(UserWithNoPrivilegeException exception) {
-        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.UNAUTHORIZED,
-                "UNAUTHORIZED", exception.getMessage(), "/call");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.FORBIDDEN,
+                "FORBIDDEN", exception.getMessage(), "/call");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 }
