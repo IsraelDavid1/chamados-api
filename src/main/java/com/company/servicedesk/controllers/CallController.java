@@ -52,8 +52,13 @@ public class CallController {
         return ResponseEntity.status(HttpStatus.OK).body(callService.getCall(callId));
     }
 
+    @GetMapping("/mycalls")
+    public ResponseEntity<List<CallModel>> getMyCalls(UUID userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getMyCalls(userId));
+    }
+
     @GetMapping("/mouthly")
-    public  ResponseEntity<List<CallModel>> getCallsByMonth(UUID userId, MonthDTO data) {
-        return ResponseEntity.status(HttpStatus.OK).body(callService.getCallsByMonth(userId, data));
+    public  ResponseEntity<List<CallModel>> getCallsByMonth(MonthDTO data) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getCallsByMonth(data));
     }
 }

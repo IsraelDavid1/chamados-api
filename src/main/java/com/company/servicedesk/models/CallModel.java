@@ -26,6 +26,14 @@ public class CallModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private UserModel createdBy;
+
+    @ManyToOne
+    @JoinTable(name = "assigned_to")
+    private UserModel assignedTo;
+
     @Column(nullable = false)
     private LocalDate beginDate;
 
@@ -48,5 +56,6 @@ public class CallModel implements Serializable {
 
     @Column LocalDate endDate;
 
+    @Enumerated(EnumType.STRING)
     @Column CallState callState;
 }

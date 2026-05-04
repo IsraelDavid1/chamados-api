@@ -2,6 +2,8 @@ package com.company.servicedesk.infra;
 
 import com.company.servicedesk.exceptions.AlreadyFinishedCallException;
 import com.company.servicedesk.exceptions.CallNotFoundException;
+import com.company.servicedesk.exceptions.UserNotFoundException;
+import com.company.servicedesk.exceptions.UserWithNoPrivilegeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +25,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<RestErrorMessage> callNotFoundHandler(CallNotFoundException exception) {
         RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.NOT_FOUND,
                 "NOT_FOUND", exception.getMessage(), "/call");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<RestErrorMessage> userNotFoundHandler(UserNotFoundException exception) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.NOT_FOUND,
+                "NOT_FOUND", exception.getMessage(), "/call");
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserWithNoPrivilegeException.class)
+    public ResponseEntity<RestErrorMessage> userWithNoPrivilegeHandler(UserWithNoPrivilegeException exception) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.UNAUTHORIZED,
+                "UNAUTHORIZED", exception.getMessage(), "/call");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 }

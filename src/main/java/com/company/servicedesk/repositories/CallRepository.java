@@ -15,11 +15,16 @@ public interface CallRepository extends JpaRepository<CallModel, UUID> {
     @Query("""
     SELECT c
     FROM Calls c
-    WHERE c.user.id = :userID
-    AND c.beginDate BETWEEN
+    WHERE c.beginDate BETWEEN
     :beginDate AND :lastDate
     """)
-    List<CallModel> findByMouth(@Param("userId") UUID userId,
-                                @Param("beginDate") LocalDate beginDate,
+    List<CallModel> findByMouth(@Param("beginDate") LocalDate beginDate,
                                 @Param("lastDate") LocalDate lastDate);
+
+    @Query("""
+    SElECT c
+    FROM Calls c
+    WHERE c.created_by.id = :userId
+    """)
+    List<CallModel> findByUser(@Param("userId") UUID userId);
 }
