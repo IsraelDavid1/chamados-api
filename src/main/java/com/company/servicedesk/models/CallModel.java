@@ -54,7 +54,7 @@ public class CallModel implements Serializable {
     @Column
     private String solution;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)

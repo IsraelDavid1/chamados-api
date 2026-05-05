@@ -10,10 +10,10 @@ import com.company.servicedesk.exceptions.UserWithNoPrivilegeException;
 import com.company.servicedesk.models.*;
 import com.company.servicedesk.repositories.CallRepository;
 import com.company.servicedesk.repositories.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.EnumSet;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class CallService {
     private final CallRepository callRepository;
@@ -61,6 +62,7 @@ public class CallService {
 
         call.setSolution(data.solution());
         call.setEndDate(data.endDate());
+        call.setCallState(CallState.COMPLETE);
 
         return callRepository.save(call);
     }
@@ -79,8 +81,8 @@ public class CallService {
     }
 
     // criar check de user logado
+    @Transactional
     public void deleteCall(UUID callId) {
-        @NonNull
         CallModel model = callRepository.findById(callId)
                 .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado"));
 
@@ -89,11 +91,8 @@ public class CallService {
 
     // criar check de user logado
     public CallModel getCall(UUID callId) {
-        @NonNull
-        CallModel call = callRepository.findById(callId)
+        return callRepository.findById(callId)
                 .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado"));
-
-        return call;
     }
 
     // criar check de user logado
@@ -102,12 +101,19 @@ public class CallService {
     }
 
     //check userId not implemented
-    public List<CallModel> getCallsByMonth(LocalDate beginDate, LocalDate lastDate) {
+    public List<CallModel> getCallsByMonth(UUID userId, LocalDate beginDate, LocalDate lastDate) {
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        //used EnumSet in this version for scalability
+        if (!EnumSet.of(UserRole.TECH, UserRole.ADMIN).contains(user.getRole())) {
+            throw new UserWithNoPrivilegeException("Usuário sem privilégio");
+        }
+
         return callRepository.findByMonth(beginDate, lastDate);
     }
 
     public List<CallModel> getAllCalls(UUID userId) {
-        @NonNull
         UserModel user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 

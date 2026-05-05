@@ -4,6 +4,7 @@ import com.company.servicedesk.exceptions.AlreadyFinishedCallException;
 import com.company.servicedesk.exceptions.CallNotFoundException;
 import com.company.servicedesk.exceptions.UserNotFoundException;
 import com.company.servicedesk.exceptions.UserWithNoPrivilegeException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,30 +16,34 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AlreadyFinishedCallException.class)
-    public ResponseEntity<RestErrorMessage> alreadyFinishedCallHandler(AlreadyFinishedCallException exception) {
+    public ResponseEntity<RestErrorMessage> alreadyFinishedCallHandler(AlreadyFinishedCallException exception,
+                                                                       HttpServletRequest request) {
         RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.BAD_REQUEST,
-                "BAD_REQUEST", exception.getMessage(), "/call");
+                "BAD_REQUEST", exception.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(CallNotFoundException.class)
-    public ResponseEntity<RestErrorMessage> callNotFoundHandler(CallNotFoundException exception) {
+    public ResponseEntity<RestErrorMessage> callNotFoundHandler(CallNotFoundException exception,
+                                                                HttpServletRequest request) {
         RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.NOT_FOUND,
-                "NOT_FOUND", exception.getMessage(), "/call");
+                "NOT_FOUND", exception.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<RestErrorMessage> userNotFoundHandler(UserNotFoundException exception) {
+    public ResponseEntity<RestErrorMessage> userNotFoundHandler(UserNotFoundException exception,
+                                                                HttpServletRequest request) {
         RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.NOT_FOUND,
-                "NOT_FOUND", exception.getMessage(), "/call");
+                "NOT_FOUND", exception.getMessage(), request.getRequestURI());
         return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(UserWithNoPrivilegeException.class)
-    public ResponseEntity<RestErrorMessage> userWithNoPrivilegeHandler(UserWithNoPrivilegeException exception) {
+    public ResponseEntity<RestErrorMessage> userWithNoPrivilegeHandler(UserWithNoPrivilegeException exception,
+                                                                       HttpServletRequest request) {
         RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.FORBIDDEN,
-                "FORBIDDEN", exception.getMessage(), "/call");
+                "FORBIDDEN", exception.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 }

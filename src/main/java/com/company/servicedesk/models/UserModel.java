@@ -34,6 +34,7 @@ public class UserModel implements Serializable {
     @Column(nullable = false)
     private String department;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 }

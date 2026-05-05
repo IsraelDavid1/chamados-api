@@ -28,12 +28,12 @@ public class CallController {
 
     @PatchMapping("/{callId}")
     public ResponseEntity<CallModel> finishCall(@PathVariable UUID callId, @RequestBody @Valid FinishCallDTO data) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(callService.finishCall(callId, data));
+        return ResponseEntity.ok(callService.finishCall(callId, data));
     }
 
     @PostMapping("/finishedcall")
     public ResponseEntity<CallModel> createFinishedCall(@RequestBody @Valid CreateCompleteCallDTO data) {
-        return ResponseEntity.status(HttpStatus.OK).body(callService.createFinishedCall(data));
+        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createFinishedCall(data));
     }
 
     @DeleteMapping("/{callId}")
@@ -57,8 +57,8 @@ public class CallController {
         return ResponseEntity.status(HttpStatus.OK).body(callService.getMyCalls(userId));
     }
 
-    @GetMapping("/mouthly")
-    public  ResponseEntity<List<CallModel>> getCallsByMonth(@RequestParam LocalDate beginDate, @RequestParam LocalDate lastDate) {
-        return ResponseEntity.status(HttpStatus.OK).body(callService.getCallsByMonth(beginDate, lastDate));
+    @GetMapping("/monthly")
+    public  ResponseEntity<List<CallModel>> getCallsByMonth(@RequestParam UUID userId, @RequestParam LocalDate beginDate, @RequestParam LocalDate lastDate) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getCallsByMonth(userId, beginDate, lastDate));
     }
 }
