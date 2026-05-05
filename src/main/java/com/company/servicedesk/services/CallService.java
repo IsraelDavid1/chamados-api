@@ -10,7 +10,6 @@ import com.company.servicedesk.exceptions.UserWithNoPrivilegeException;
 import com.company.servicedesk.models.*;
 import com.company.servicedesk.repositories.CallRepository;
 import com.company.servicedesk.repositories.UserRepository;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
