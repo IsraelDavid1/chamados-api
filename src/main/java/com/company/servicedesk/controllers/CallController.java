@@ -59,6 +59,6 @@ public class CallController {
 
     @GetMapping("/monthly")
     public  ResponseEntity<List<CallModel>> getCallsByMonth(@RequestParam UUID userId, @RequestParam LocalDate beginDate, @RequestParam LocalDate lastDate) {
-        return ResponseEntity.status(HttpStatus.OK).body(callService.getCallsByMonth(userId, beginDate, lastDate));
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getAssignedCallsByMonth(userId, beginDate, lastDate));
     }
 }

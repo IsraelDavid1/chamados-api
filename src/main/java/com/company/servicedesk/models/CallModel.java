@@ -31,8 +31,8 @@ public class CallModel implements Serializable {
     private UserModel createdBy;
 
     @ManyToOne
-    @Column(name = "assigned_to")
-    private String assignedTo;
+    @JoinColumn(name = "assigned_to")
+    private UserModel assignedTo;
 
     @Column(nullable = false)
     private LocalDate beginDate;

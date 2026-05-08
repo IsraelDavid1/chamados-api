@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -27,10 +26,12 @@ public class CallService {
     private final CallRepository callRepository;
     private final UserRepository userRepository;
 
-    private CallModel buildBaseCall(LocalDate beginDate, String tech, Assets asset,
+    private CallModel buildBaseCall(LocalDate beginDate, String techLogin, Assets asset,
                                     AssetsType assetType, String department,
                                     String firstAnalysis) {
         CallModel call = new CallModel();
+        UserModel tech = userRepository.findByLogin(techLogin)
+                        .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         call.setBeginDate(beginDate);
         call.setAssignedTo(tech);
@@ -42,14 +43,34 @@ public class CallService {
         return call;
     }
 
-    // criar check de user logado, e ResponseDTO
-    @Transactional
-    public CallModel createCall(UUID userId ,CreateCallDTO data) {
-        CallModel call = buildBaseCall(data.beginDate(), data.tech(), data.asset(),
-                data.assetType(), data.department(), data.firstAnalysis());
-
+    private UserModel assertHasElevatedRole(UUID userId) {
         UserModel user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        //used EnumSet in this version for scalability
+        if (!EnumSet.of(UserRole.TECH, UserRole.ADMIN).contains(user.getRole())) {
+            throw new UserWithNoPrivilegeException("Usuário sem privilégio");
+        }
+        return user;
+    }
+
+    private UserModel findUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+    }
+
+    private CallModel findCallById(UUID callId) {
+        return callRepository.findById(callId)
+                .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado"));
+    }
+
+    // criar check de user logado, e ResponseDTO
+    @Transactional
+    public CallModel createCall(UUID userId, CreateCallDTO data) {
+        CallModel call = buildBaseCall(data.beginDate(), data.techLogin(), data.asset(),
+                data.assetType(), data.department(), data.firstAnalysis());
+
+        UserModel user = findUserById(userId);
 
         call.setCreatedBy(user);
 
@@ -58,9 +79,8 @@ public class CallService {
 
     // criar check de user logado
     @Transactional
-    public CallModel finishCall(UUID callID, FinishCallDTO data) {
-        CallModel call = callRepository.findById(callID)
-                .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado!"));
+    public CallModel finishCall(UUID callId, FinishCallDTO data) {
+        CallModel call = findCallById(callId);
 
         // create exception
         if (call.getCallState() == CallState.COMPLETE) {
@@ -77,11 +97,10 @@ public class CallService {
     // criar check de user logado
     @Transactional
     public CallModel createFinishedCall(UUID userId, CreateCompleteCallDTO data){
-        CallModel call = buildBaseCall(data.beginDate(), data.tech(), data.asset(),
+        CallModel call = buildBaseCall(data.beginDate(), data.techLogin(), data.asset(),
                 data.assetType(), data.department(), data.firstAnalysis());
 
-        UserModel user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+        UserModel user = findUserById(userId);
 
         call.setCreatedBy(user);
         call.setSolution(data.solution());
@@ -94,45 +113,29 @@ public class CallService {
     // criar check de user logado
     @Transactional
     public void deleteCall(UUID callId) {
-        CallModel model = callRepository.findById(callId)
-                .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado"));
+        CallModel model = findCallById(callId);
 
         callRepository.delete(model);
     }
 
     // criar check de user logado
     public CallModel getCall(UUID callId) {
-        return callRepository.findById(callId)
-                .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado"));
+        return findCallById(callId);
     }
 
     // criar check de user logado
     public List<CallModel> getMyCalls(UUID userId) {
-        return callRepository.findByUser(userId);
+        return callRepository.findByUserId(userId);
     }
 
     //check userId not implemented
-    public List<CallModel> getCallsByMonth(UUID userId, LocalDate beginDate, LocalDate lastDate) {
-        UserModel user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
-
-        //used EnumSet in this version for scalability
-        if (!EnumSet.of(UserRole.TECH, UserRole.ADMIN).contains(user.getRole())) {
-            throw new UserWithNoPrivilegeException("Usuário sem privilégio");
-        }
-
-        return callRepository.findByMonth(beginDate, lastDate);
+    public List<CallModel> getAssignedCallsByMonth(UUID techId, LocalDate beginDate, LocalDate lastDate) {
+        UserModel user = assertHasElevatedRole(techId);
+        return callRepository.findByMonth(user.getId() ,beginDate, lastDate);
     }
 
     public List<CallModel> getAllCalls(UUID userId) {
-        UserModel user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
-
-        //used EnumSet in this version for scalability
-        if (!EnumSet.of(UserRole.TECH, UserRole.ADMIN).contains(user.getRole())) {
-            throw new UserWithNoPrivilegeException("Usuário sem privilégio");
-        }
-
+        assertHasElevatedRole(userId);
         return callRepository.findAll();
     }
 }
