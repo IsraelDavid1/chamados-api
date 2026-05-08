@@ -1,0 +1,771 @@
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\.mvn\wrapper\maven-wrapper.properties ---
+wrapperVersion=3.3.4
+distributionType=only-script
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.14/apache-maven-3.9.14-bin.zip
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\controllers\CallController.java ---
+package com.company.servicedesk.controllers;
+
+import com.company.servicedesk.dtos.CreateCallDTO;
+import com.company.servicedesk.dtos.CreateCompleteCallDTO;
+import com.company.servicedesk.dtos.FinishCallDTO;
+import com.company.servicedesk.models.CallModel;
+import com.company.servicedesk.services.CallService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/call")
+public class CallController {
+    private final CallService callService;
+
+    @PostMapping
+    public ResponseEntity<CallModel> createCall(@RequestParam UUID userId, @RequestBody @Valid CreateCallDTO data) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createCall(userId, data));
+    }
+
+    @PatchMapping("/{callId}")
+    public ResponseEntity<CallModel> finishCall(@PathVariable UUID callId, @RequestBody @Valid FinishCallDTO data) {
+        return ResponseEntity.ok(callService.finishCall(callId, data));
+    }
+
+    @PostMapping("/finishedcall")
+    public ResponseEntity<CallModel> createFinishedCall(@RequestParam UUID userId, @RequestBody @Valid CreateCompleteCallDTO data) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createFinishedCall(userId, data));
+    }
+
+    @DeleteMapping("/{callId}")
+    public ResponseEntity<Void> deleteCall(@PathVariable UUID callId) {
+        callService.deleteCall(callId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public  ResponseEntity<List<CallModel>> getAllCalls(@RequestParam UUID userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getAllCalls(userId));
+    }
+
+    @GetMapping("/{callId}")
+    public ResponseEntity<CallModel> getCall(@PathVariable UUID callId) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getCall(callId));
+    }
+
+    @GetMapping("/mycalls")
+    public ResponseEntity<List<CallModel>> getMyCalls(@RequestParam UUID userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getMyCalls(userId));
+    }
+
+    @GetMapping("/monthly")
+    public  ResponseEntity<List<CallModel>> getCallsByMonth(@RequestParam UUID userId, @RequestParam LocalDate beginDate, @RequestParam LocalDate lastDate) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getCallsByMonth(userId, beginDate, lastDate));
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\dtos\CreateCallDTO.java ---
+package com.company.servicedesk.dtos;
+
+import com.company.servicedesk.models.Assets;
+import com.company.servicedesk.models.AssetsType;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+public record CreateCallDTO(@NotNull LocalDate beginDate,
+                            @NotNull String tech,
+                            @NotNull Assets asset,
+                            @NotNull AssetsType assetType,
+                            String department,
+                            String firstAnalysis) {
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\dtos\CreateCompleteCallDTO.java ---
+package com.company.servicedesk.dtos;
+
+import com.company.servicedesk.models.Assets;
+import com.company.servicedesk.models.AssetsType;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+public record CreateCompleteCallDTO(@NotNull LocalDate beginDate,
+                                    @NotNull String tech,
+                                    @NotNull Assets asset,
+                                    @NotNull AssetsType assetType,
+                                    String department,
+                                    String firstAnalysis,
+                                    String solution,
+                                    @NotNull LocalDate endDate) {
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\dtos\FinishCallDTO.java ---
+package com.company.servicedesk.dtos;
+
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+
+public record FinishCallDTO(String solution,
+                            @NotNull LocalDate endDate) {
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\exceptions\AlreadyFinishedCallException.java ---
+package com.company.servicedesk.exceptions;
+
+public class AlreadyFinishedCallException extends RuntimeException{
+    public AlreadyFinishedCallException(String message) { super(message);}
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\exceptions\CallNotFoundException.java ---
+package com.company.servicedesk.exceptions;
+
+public class CallNotFoundException extends RuntimeException {
+    public CallNotFoundException(String message) {
+        super(message);
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\exceptions\UserNotFoundException.java ---
+package com.company.servicedesk.exceptions;
+
+public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(String message) {
+        super(message);
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\exceptions\UserWithNoPrivilegeException.java ---
+package com.company.servicedesk.exceptions;
+
+public class UserWithNoPrivilegeException extends RuntimeException {
+    public UserWithNoPrivilegeException(String message) {
+        super(message);
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\infra\RestErrorMessage.java ---
+package com.company.servicedesk.infra;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.http.HttpStatus;
+
+import java.time.LocalDateTime;
+
+@AllArgsConstructor
+@Getter
+@Setter
+public class RestErrorMessage {
+    private LocalDateTime timestamp;
+    private HttpStatus status;
+    private String error;
+    private String message;
+    private String path;
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\infra\RestExceptionHandler.java ---
+package com.company.servicedesk.infra;
+
+import com.company.servicedesk.exceptions.AlreadyFinishedCallException;
+import com.company.servicedesk.exceptions.CallNotFoundException;
+import com.company.servicedesk.exceptions.UserNotFoundException;
+import com.company.servicedesk.exceptions.UserWithNoPrivilegeException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.time.LocalDateTime;
+
+@RestControllerAdvice
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(AlreadyFinishedCallException.class)
+    public ResponseEntity<RestErrorMessage> alreadyFinishedCallHandler(AlreadyFinishedCallException exception,
+                                                                       HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.BAD_REQUEST,
+                "BAD_REQUEST", exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(CallNotFoundException.class)
+    public ResponseEntity<RestErrorMessage> callNotFoundHandler(CallNotFoundException exception,
+                                                                HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.NOT_FOUND,
+                "NOT_FOUND", exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<RestErrorMessage> userNotFoundHandler(UserNotFoundException exception,
+                                                                HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.NOT_FOUND,
+                "NOT_FOUND", exception.getMessage(), request.getRequestURI());
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserWithNoPrivilegeException.class)
+    public ResponseEntity<RestErrorMessage> userWithNoPrivilegeHandler(UserWithNoPrivilegeException exception,
+                                                                       HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.FORBIDDEN,
+                "FORBIDDEN", exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\models\Assets.java ---
+package com.company.servicedesk.models;
+
+import lombok.Getter;
+
+@Getter
+public enum Assets {
+    HARDWARE("hardware"),
+    SOFTWARE("software"),
+    CLOUD("cloud"),
+    INTERNET("internet"),
+    DATA("data");
+
+    private final String asset;
+
+    Assets(String asset) {
+        this.asset = asset;
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\models\AssetsType.java ---
+package com.company.servicedesk.models;
+
+import lombok.Getter;
+
+@Getter
+public enum AssetsType {
+    DESKTOP("desktop"),
+    NOTEBOOK("notebook"),
+    MONITOR("monitor"),
+    PRINTER("printer"),
+    SCANNER("scanner"),
+    SERVER("server"),
+    NO_BREAK("no_break"),
+    PERIPHERALS("peripherals"),
+    OPERATIONAL_SYSTEM("operational_system"),
+    NAVIGATOR("navigator"),
+    ANTIVIRUS("antivirus"),
+    FIREWALL("firewall"),
+    DATABASE("database"),
+    VIRTUAL_MACHINE("virtual_machine"),
+    CONTAINER("container"),
+    BACKUP("backup"),
+    WIFI("wifi"),
+    ROUTER("router"),
+    SWITCH("switch"),
+    VPN("vpn"),
+    DHCP("dhcp"),
+    DNS("dns"),
+    WIRES("wires"),
+    NO_ACCESS("no_access"),
+    MIGRATIONS("migrations"),
+    CORRUPTED("corrupted"),
+    LOST_DATA("lost_data");
+
+    private final String assetType;
+
+    AssetsType(String assetType) {
+        this.assetType = assetType;
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\models\CallModel.java ---
+package com.company.servicedesk.models;
+
+import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.UUID;
+
+@NoArgsConstructor
+@Getter
+@Setter
+@Entity(name = "Calls")
+@Table(name = "tb_calls")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class CallModel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @EqualsAndHashCode.Include
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private UserModel createdBy;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_to")
+    private String assignedTo;
+
+    @Column(nullable = false)
+    private LocalDate beginDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Assets asset;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AssetsType assetsType;
+
+    @Column(nullable = false)
+    private String department;
+
+    @Column
+    private String firstAnalysis;
+
+    @Column
+    private String solution;
+
+    @Column
+    private LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CallState callState = CallState.INCOMPLETE;
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\models\CallState.java ---
+package com.company.servicedesk.models;
+
+import lombok.Getter;
+
+@Getter
+public enum CallState {
+    INCOMPLETE("incomplete"),
+    COMPLETE("complete");
+
+    private final String callState;
+
+    CallState(String callState) {
+        this.callState = callState;
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\models\UserModel.java ---
+package com.company.servicedesk.models;
+
+import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.UUID;
+
+@NoArgsConstructor
+@Getter
+@Setter
+@Entity(name = "Users") //plural to avoid errors with the postgres
+@Table(name = "tb_users")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class UserModel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @EqualsAndHashCode.Include
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
+    private String login;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String department;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\models\UserRole.java ---
+package com.company.servicedesk.models;
+
+import lombok.Getter;
+
+@Getter
+public enum UserRole {
+    USER("user"),
+    TECH("tech"),
+    ADMIN("admin");
+
+    private final String role;
+
+    UserRole(String role){
+        this.role = role;
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\repositories\CallRepository.java ---
+package com.company.servicedesk.repositories;
+
+import com.company.servicedesk.models.CallModel;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+public interface CallRepository extends JpaRepository<CallModel, UUID> {
+    @Query("""
+    SELECT c
+    FROM Calls c
+    WHERE c.beginDate BETWEEN
+    :beginDate AND :lastDate
+    """)
+    List<CallModel> findByMonth(@Param("beginDate") LocalDate beginDate,
+                                @Param("lastDate") LocalDate lastDate);
+
+    @Query("""
+    SELECT c
+    FROM Calls c
+    WHERE c.createdBy.id = :userId
+    """)
+    List<CallModel> findByUser(@Param("userId") UUID userId);
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\repositories\UserRepository.java ---
+package com.company.servicedesk.repositories;
+
+import com.company.servicedesk.models.UserModel;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public interface UserRepository extends JpaRepository<UserModel, UUID> {
+    Optional<UserModel> findByLogin(String login);
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\services\CallService.java ---
+package com.company.servicedesk.services;
+
+import com.company.servicedesk.dtos.CreateCallDTO;
+import com.company.servicedesk.dtos.CreateCompleteCallDTO;
+import com.company.servicedesk.dtos.FinishCallDTO;
+import com.company.servicedesk.exceptions.AlreadyFinishedCallException;
+import com.company.servicedesk.exceptions.CallNotFoundException;
+import com.company.servicedesk.exceptions.UserNotFoundException;
+import com.company.servicedesk.exceptions.UserWithNoPrivilegeException;
+import com.company.servicedesk.models.*;
+import com.company.servicedesk.repositories.CallRepository;
+import com.company.servicedesk.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
+public class CallService {
+    private final CallRepository callRepository;
+    private final UserRepository userRepository;
+
+    private CallModel buildBaseCall(LocalDate beginDate, String tech, Assets asset,
+                                    AssetsType assetType, String department,
+                                    String firstAnalysis) {
+        CallModel call = new CallModel();
+
+        call.setBeginDate(beginDate);
+        call.setAssignedTo(tech);
+        call.setAsset(asset);
+        call.setAssetsType(assetType);
+        call.setDepartment(department);
+        call.setFirstAnalysis(firstAnalysis);
+
+        return call;
+    }
+
+    // criar check de user logado, e ResponseDTO
+    @Transactional
+    public CallModel createCall(UUID userId ,CreateCallDTO data) {
+        CallModel call = buildBaseCall(data.beginDate(), data.tech(), data.asset(),
+                data.assetType(), data.department(), data.firstAnalysis());
+
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        call.setCreatedBy(user);
+
+        return callRepository.save(call);
+    }
+
+    // criar check de user logado
+    @Transactional
+    public CallModel finishCall(UUID callID, FinishCallDTO data) {
+        CallModel call = callRepository.findById(callID)
+                .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado!"));
+
+        // create exception
+        if (call.getCallState() == CallState.COMPLETE) {
+            throw new AlreadyFinishedCallException("Chamado já finalizado!");
+        }
+
+        call.setSolution(data.solution());
+        call.setEndDate(data.endDate());
+        call.setCallState(CallState.COMPLETE);
+
+        return callRepository.save(call);
+    }
+
+    // criar check de user logado
+    @Transactional
+    public CallModel createFinishedCall(UUID userId, CreateCompleteCallDTO data){
+        CallModel call = buildBaseCall(data.beginDate(), data.tech(), data.asset(),
+                data.assetType(), data.department(), data.firstAnalysis());
+
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        call.setCreatedBy(user);
+        call.setSolution(data.solution());
+        call.setEndDate(data.endDate());
+        call.setCallState(CallState.COMPLETE);
+
+        return callRepository.save(call);
+    }
+
+    // criar check de user logado
+    @Transactional
+    public void deleteCall(UUID callId) {
+        CallModel model = callRepository.findById(callId)
+                .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado"));
+
+        callRepository.delete(model);
+    }
+
+    // criar check de user logado
+    public CallModel getCall(UUID callId) {
+        return callRepository.findById(callId)
+                .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado"));
+    }
+
+    // criar check de user logado
+    public List<CallModel> getMyCalls(UUID userId) {
+        return callRepository.findByUser(userId);
+    }
+
+    //check userId not implemented
+    public List<CallModel> getCallsByMonth(UUID userId, LocalDate beginDate, LocalDate lastDate) {
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        //used EnumSet in this version for scalability
+        if (!EnumSet.of(UserRole.TECH, UserRole.ADMIN).contains(user.getRole())) {
+            throw new UserWithNoPrivilegeException("Usuário sem privilégio");
+        }
+
+        return callRepository.findByMonth(beginDate, lastDate);
+    }
+
+    public List<CallModel> getAllCalls(UUID userId) {
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        //used EnumSet in this version for scalability
+        if (!EnumSet.of(UserRole.TECH, UserRole.ADMIN).contains(user.getRole())) {
+            throw new UserWithNoPrivilegeException("Usuário sem privilégio");
+        }
+
+        return callRepository.findAll();
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\java\com\company\servicedesk\ChamadosApiApplication.java ---
+package com.company.servicedesk;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ChamadosApiApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ChamadosApiApplication.class, args);
+	}
+
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\main\resources\application.properties ---
+spring.application.name=chamados-api
+server.port=${PORT:8080}
+
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
+
+api.security.token.secret=${JWT_SECRET}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\test\java\com\company\servicedesk\repositories\CallRepositoryTest.java ---
+package com.company.servicedesk.repositories;
+
+import com.company.servicedesk.dtos.CreateCompleteCallDTO;
+import com.company.servicedesk.exceptions.UserNotFoundException;
+import com.company.servicedesk.models.*;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+@DataJpaTest
+@ActiveProfiles("test")
+class CallRepositoryTest {
+    @Autowired
+    EntityManager entityManager;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    CallRepository callRepository;
+
+    @Test
+    @DisplayName("should get calls in a specific month")
+    void findByMonthSucess() {
+        UUID userId = UUID.randomUUID();
+
+        CreateCompleteCallDTO data = new CreateCompleteCallDTO(LocalDate.now(), "Israel", Assets.DATA,
+                AssetsType.ANTIVIRUS, "TI", "virus detectado", "virus apagado",
+                LocalDate.now());
+
+        this.createCall(userId, data);
+
+        List<CallModel> result = callRepository.findByMonth(LocalDate.now(), LocalDate.now());
+
+        assertThat(result);
+    }
+
+    void findByMonthFailure() {
+        List<CallModel> result = callRepository.findByMonth(LocalDate.now(), LocalDate.now());
+
+        assertThat(result);
+    }
+
+    @Test
+    void findByUser() {
+    }
+
+    private CallModel createCall(UUID userId, CreateCompleteCallDTO data) {
+        CallModel newCall = new CallModel();
+
+        UserModel user = userRepository.findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        newCall.setCreatedBy(user);
+        newCall.setBeginDate(data.beginDate());
+        newCall.setAssignedTo(data.tech());
+        newCall.setAsset(data.asset());
+        newCall.setAssetsType(data.assetType());
+        newCall.setDepartment(data.department());
+        newCall.setFirstAnalysis(data.firstAnalysis());
+        newCall.setSolution(data.solution());
+        newCall.setEndDate(data.endDate());
+        newCall.setCallState(CallState.COMPLETE);
+
+        this.entityManager.persist(newCall);
+        return newCall;
+    }
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\test\java\com\company\servicedesk\ChamadosApiApplicationTests.java ---
+package com.company.servicedesk;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class ChamadosApiApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\src\test\resources\application-test.properties ---
+spring.datasource.url=jdbc:h2:mem:testdb;NON_KEYWORDS=VALUE
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=create-drop
+
+spring.flyway.enabled=false
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\target\classes\application.properties ---
+spring.application.name=chamados-api
+server.port=${PORT:8080}
+
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
+
+api.security.token.secret=${JWT_SECRET}
+
+--- ARQUIVO: C:\Users\ester\Área de Trabalho\projetos\java\chamados-api\target\test-classes\application-test.properties ---
+spring.datasource.url=jdbc:h2:mem:testdb;NON_KEYWORDS=VALUE
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=create-drop
+
+spring.flyway.enabled=false
+
