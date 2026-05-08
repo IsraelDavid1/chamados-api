@@ -22,8 +22,8 @@ public class CallController {
     private final CallService callService;
 
     @PostMapping
-    public ResponseEntity<CallModel> createCall(@RequestBody @Valid CreateCallDTO data) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createCall(data));
+    public ResponseEntity<CallModel> createCall(@RequestParam UUID userId, @RequestBody @Valid CreateCallDTO data) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createCall(userId, data));
     }
 
     @PatchMapping("/{callId}")
@@ -32,8 +32,8 @@ public class CallController {
     }
 
     @PostMapping("/finishedcall")
-    public ResponseEntity<CallModel> createFinishedCall(@RequestBody @Valid CreateCompleteCallDTO data) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createFinishedCall(data));
+    public ResponseEntity<CallModel> createFinishedCall(@RequestParam UUID userId, @RequestBody @Valid CreateCompleteCallDTO data) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createFinishedCall(userId, data));
     }
 
     @DeleteMapping("/{callId}")

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -26,12 +27,13 @@ public class CallService {
     private final CallRepository callRepository;
     private final UserRepository userRepository;
 
-    private CallModel buildBaseCall(LocalDate beginDate, Assets asset,
+    private CallModel buildBaseCall(LocalDate beginDate, String tech, Assets asset,
                                     AssetsType assetType, String department,
                                     String firstAnalysis) {
         CallModel call = new CallModel();
 
         call.setBeginDate(beginDate);
+        call.setAssignedTo(tech);
         call.setAsset(asset);
         call.setAssetsType(assetType);
         call.setDepartment(department);
@@ -39,11 +41,17 @@ public class CallService {
 
         return call;
     }
+
     // criar check de user logado, e ResponseDTO
     @Transactional
-    public CallModel createCall(CreateCallDTO data) {
-        CallModel call = buildBaseCall(data.beginDate(), data.asset(),
+    public CallModel createCall(UUID userId ,CreateCallDTO data) {
+        CallModel call = buildBaseCall(data.beginDate(), data.tech(), data.asset(),
                 data.assetType(), data.department(), data.firstAnalysis());
+
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        call.setCreatedBy(user);
 
         return callRepository.save(call);
     }
@@ -68,10 +76,14 @@ public class CallService {
 
     // criar check de user logado
     @Transactional
-    public CallModel createFinishedCall(CreateCompleteCallDTO data){
-        CallModel call = buildBaseCall(data.beginDate(), data.asset(),
+    public CallModel createFinishedCall(UUID userId, CreateCompleteCallDTO data){
+        CallModel call = buildBaseCall(data.beginDate(), data.tech(), data.asset(),
                 data.assetType(), data.department(), data.firstAnalysis());
 
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        call.setCreatedBy(user);
         call.setSolution(data.solution());
         call.setEndDate(data.endDate());
         call.setCallState(CallState.COMPLETE);
