@@ -36,6 +36,7 @@ class CallRepositoryTest {
     }
 
     @Test
+    @DisplayName("should fail in get calls because there is no month")
     void findByMonthFailure() {
         UserModel user = createUser();
         List<CallModel> result = callRepository.findByMonth(user.getId() ,LocalDate.now(), LocalDate.now());
@@ -44,6 +45,7 @@ class CallRepositoryTest {
     }
 
     @Test
+    @DisplayName("should get user")
     void findByUserIdSuccess() {
         UserModel user = createUser();
         UserModel tech = createUser();
@@ -57,6 +59,7 @@ class CallRepositoryTest {
     }
 
     @Test
+    @DisplayName("should not get unexistent user")
     void findByUserIdFailure() {
         UserModel user = createUser();
 
@@ -64,7 +67,6 @@ class CallRepositoryTest {
 
         assertThat(result).isEmpty();
     }
-
 
     private CallModel createCall(UserModel user, UserModel tech) {
         CallModel newCall = new CallModel();
