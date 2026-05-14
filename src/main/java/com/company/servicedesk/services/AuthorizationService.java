@@ -1,7 +1,6 @@
 package com.company.servicedesk.services;
 
 import com.company.servicedesk.dtos.RegisterDTO;
-import com.company.servicedesk.dtos.UserResponseDTO;
 import com.company.servicedesk.exceptions.UserAlreadyExistsException;
 import com.company.servicedesk.exceptions.UserNotFoundException;
 import com.company.servicedesk.models.UserModel;
@@ -15,8 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
