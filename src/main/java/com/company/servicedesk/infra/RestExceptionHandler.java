@@ -1,9 +1,6 @@
 package com.company.servicedesk.infra;
 
-import com.company.servicedesk.exceptions.AlreadyFinishedCallException;
-import com.company.servicedesk.exceptions.CallNotFoundException;
-import com.company.servicedesk.exceptions.UserNotFoundException;
-import com.company.servicedesk.exceptions.UserWithNoPrivilegeException;
+import com.company.servicedesk.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,5 +42,29 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.FORBIDDEN,
                 "FORBIDDEN", exception.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidOrExpiredTokenException.class)
+    public ResponseEntity<RestErrorMessage> invalidOrExpiredTokenHandler(InvalidOrExpiredTokenException exception,
+                                                                         HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.UNAUTHORIZED,
+                "UNAUTHORIZED", exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<RestErrorMessage> userAlreadyExistsHandler(UserAlreadyExistsException exception,
+                                                                     HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.CONFLICT,
+                "CONFLICT", exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(TokenGenerationException.class)
+    public ResponseEntity<RestErrorMessage> tokenGenerationHandler(TokenGenerationException exception,
+                                                                   HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.INTERNAL_SERVER_ERROR,
+                "INTERNAL_SERVER_ERROR", exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

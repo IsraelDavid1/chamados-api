@@ -1,13 +1,15 @@
 package com.company.servicedesk.models;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -16,7 +18,7 @@ import java.util.UUID;
 @Entity(name = "Users") //plural to avoid errors with the postgres
 @Table(name = "tb_users")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class UserModel implements Serializable {
+public class UserModel implements Serializable, UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -37,4 +39,28 @@ public class UserModel implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return switch (this.role) {
+            case ADMIN -> List.of(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_TECH"),
+                    new SimpleGrantedAuthority("ROLE_USER")
+            );
+            case TECH -> List.of(
+                    new SimpleGrantedAuthority("ROLE_TECH"),
+                    new SimpleGrantedAuthority("ROLE_USER")
+            );
+            case USER -> List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        };
+    }
+
+    @Override
+    public String getUsername() { return login; }
+
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
 }

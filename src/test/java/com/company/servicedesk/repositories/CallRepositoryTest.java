@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -19,7 +20,6 @@ class CallRepositoryTest {
     EntityManager entityManager;
     @Autowired
     CallRepository callRepository;
-    private int userCount = 0;
 
     @Test
     @DisplayName("should get calls in a specific month")
@@ -28,7 +28,7 @@ class CallRepositoryTest {
         UserModel tech = createUser();
         this.createCall(user, tech);
 
-        List<CallModel> result = callRepository.findByMonth(user.getId(), LocalDate.now(), LocalDate.now());
+        List<CallModel> result = callRepository.findByMonth(tech.getId(), LocalDate.now(), LocalDate.now());
 
         assertThat(result).isNotEmpty();
         assertThat(result).hasSize(1);
@@ -36,7 +36,7 @@ class CallRepositoryTest {
     }
 
     @Test
-    @DisplayName("should fail in get calls because there is no month")
+    @DisplayName("should fail in get calls because there is no call in date")
     void findByMonthFailure() {
         UserModel user = createUser();
         List<CallModel> result = callRepository.findByMonth(user.getId() ,LocalDate.now(), LocalDate.now());
@@ -68,7 +68,7 @@ class CallRepositoryTest {
         assertThat(result).isEmpty();
     }
 
-    private CallModel createCall(UserModel user, UserModel tech) {
+    private void createCall(UserModel user, UserModel tech) {
         CallModel newCall = new CallModel();
 
         newCall.setCreatedBy(user);
@@ -77,18 +77,17 @@ class CallRepositoryTest {
         newCall.setAsset(Assets.DATA);
         newCall.setAssetsType(AssetsType.ANTIVIRUS);
         newCall.setDepartment("TI");
-        newCall.setFirstAnalysis("analisado");
-        newCall.setSolution("solucionado");
+        newCall.setFirstAnalysis("analysed");
+        newCall.setSolution("solved");
         newCall.setEndDate(LocalDate.now());
         newCall.setCallState(CallState.COMPLETE);
 
         this.entityManager.persist(newCall);
-        return newCall;
     }
 
     private UserModel createUser() {
         UserModel user = new UserModel();
-        user.setLogin("tecnico" + (++userCount));
+        user.setLogin("tech" + UUID.randomUUID());
         user.setPassword("hash");
         user.setDepartment("TI");
         user.setRole(UserRole.TECH);

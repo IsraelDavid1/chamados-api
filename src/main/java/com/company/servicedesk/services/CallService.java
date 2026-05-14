@@ -26,12 +26,10 @@ public class CallService {
     private final CallRepository callRepository;
     private final UserRepository userRepository;
 
-    private CallModel buildBaseCall(LocalDate beginDate, String techLogin, Assets asset,
-                                    AssetsType assetType, String department,
-                                    String firstAnalysis) {
+    private CallModel buildBaseCall(LocalDate beginDate, UserModel tech,
+                                    Assets asset, AssetsType assetType,
+                                    String department, String firstAnalysis) {
         CallModel call = new CallModel();
-        UserModel tech = userRepository.findByLogin(techLogin)
-                        .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
         call.setBeginDate(beginDate);
         call.setAssignedTo(tech);
@@ -54,6 +52,11 @@ public class CallService {
         return user;
     }
 
+    private UserModel findUserByLogin(String userLogin) {
+        return userRepository.findByLogin(userLogin)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+    }
+
     private UserModel findUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
@@ -64,10 +67,10 @@ public class CallService {
                 .orElseThrow(() -> new CallNotFoundException("Chamado não encontrado"));
     }
 
-    // criar check de user logado, e ResponseDTO
     @Transactional
     public CallModel createCall(UUID userId, CreateCallDTO data) {
-        CallModel call = buildBaseCall(data.beginDate(), data.techLogin(), data.asset(),
+        UserModel tech = findUserByLogin(data.techLogin());
+        CallModel call = buildBaseCall(data.beginDate(), tech, data.asset(),
                 data.assetType(), data.department(), data.firstAnalysis());
 
         UserModel user = findUserById(userId);
@@ -77,12 +80,10 @@ public class CallService {
         return callRepository.save(call);
     }
 
-    // criar check de user logado
     @Transactional
     public CallModel finishCall(UUID callId, FinishCallDTO data) {
         CallModel call = findCallById(callId);
 
-        // create exception
         if (call.getCallState() == CallState.COMPLETE) {
             throw new AlreadyFinishedCallException("Chamado já finalizado!");
         }
@@ -94,10 +95,10 @@ public class CallService {
         return callRepository.save(call);
     }
 
-    // criar check de user logado
     @Transactional
     public CallModel createFinishedCall(UUID userId, CreateCompleteCallDTO data){
-        CallModel call = buildBaseCall(data.beginDate(), data.techLogin(), data.asset(),
+        UserModel tech = findUserByLogin(data.techLogin());
+        CallModel call = buildBaseCall(data.beginDate(), tech, data.asset(),
                 data.assetType(), data.department(), data.firstAnalysis());
 
         UserModel user = findUserById(userId);
@@ -110,7 +111,6 @@ public class CallService {
         return callRepository.save(call);
     }
 
-    // criar check de user logado
     @Transactional
     public void deleteCall(UUID callId) {
         CallModel model = findCallById(callId);
@@ -118,17 +118,14 @@ public class CallService {
         callRepository.delete(model);
     }
 
-    // criar check de user logado
     public CallModel getCall(UUID callId) {
         return findCallById(callId);
     }
 
-    // criar check de user logado
     public List<CallModel> getMyCalls(UUID userId) {
         return callRepository.findByUserId(userId);
     }
 
-    //check userId not implemented
     public List<CallModel> getAssignedCallsByMonth(UUID techId, LocalDate beginDate, LocalDate lastDate) {
         UserModel user = assertHasElevatedRole(techId);
         return callRepository.findByMonth(user.getId() ,beginDate, lastDate);
