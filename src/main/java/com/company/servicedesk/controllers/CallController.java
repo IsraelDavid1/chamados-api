@@ -1,5 +1,6 @@
 package com.company.servicedesk.controllers;
 
+import com.company.servicedesk.dtos.CallResponseDTO;
 import com.company.servicedesk.dtos.CreateCallDTO;
 import com.company.servicedesk.dtos.CreateCompleteCallDTO;
 import com.company.servicedesk.dtos.FinishCallDTO;
@@ -25,18 +26,21 @@ public class CallController {
     private final CallService callService;
 
     @PostMapping
-    public ResponseEntity<CallModel> createCall(@AuthenticationPrincipal UserModel user, @RequestBody @Valid CreateCallDTO data) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createCall(user.getId(), data));
+    public ResponseEntity<CallResponseDTO> createCall(@AuthenticationPrincipal UserModel user, @RequestBody @Valid CreateCallDTO data) {
+        CallModel call = callService.createCall(user.getId(), data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(call));
     }
 
     @PatchMapping("/{callId}")
-    public ResponseEntity<CallModel> finishCall(@PathVariable UUID callId, @RequestBody @Valid FinishCallDTO data) {
-        return ResponseEntity.ok(callService.finishCall(callId, data));
+    public ResponseEntity<CallResponseDTO> finishCall(@PathVariable UUID callId, @RequestBody @Valid FinishCallDTO data) {
+        CallModel call = callService.finishCall(callId, data);
+        return ResponseEntity.status(HttpStatus.OK).body(toDTO(call));
     }
 
     @PostMapping("/finishedcall")
-    public ResponseEntity<CallModel> createFinishedCall(@AuthenticationPrincipal UserModel user, @RequestBody @Valid CreateCompleteCallDTO data) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(callService.createFinishedCall(user.getId(), data));
+    public ResponseEntity<CallResponseDTO> createFinishedCall(@AuthenticationPrincipal UserModel user, @RequestBody @Valid CreateCompleteCallDTO data) {
+        CallModel call = callService.createFinishedCall(user.getId(), data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(call));
     }
 
     @DeleteMapping("/{callId}")
@@ -47,23 +51,40 @@ public class CallController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('TECH', 'ADMIN')")
-    public  ResponseEntity<List<CallModel>> getAllCalls(@AuthenticationPrincipal UserModel user) {
-        return ResponseEntity.status(HttpStatus.OK).body(callService.getAllCalls(user.getId()));
+    public  ResponseEntity<List<CallResponseDTO>> getAllCalls(@AuthenticationPrincipal UserModel user) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getAllCalls().stream().map(this::toDTO).toList());
     }
 
     @GetMapping("/{callId}")
-    public ResponseEntity<CallModel> getCall(@PathVariable UUID callId) {
-        return ResponseEntity.status(HttpStatus.OK).body(callService.getCall(callId));
+    public ResponseEntity<CallResponseDTO> getCall(@PathVariable UUID callId) {
+        CallModel call = callService.getCall(callId);
+        return ResponseEntity.status(HttpStatus.OK).body(toDTO(call));
     }
 
     @GetMapping("/mycalls")
-    public ResponseEntity<List<CallModel>> getMyCalls(@AuthenticationPrincipal UserModel user) {
-        return ResponseEntity.status(HttpStatus.OK).body(callService.getMyCalls(user.getId()));
+    public ResponseEntity<List<CallResponseDTO>> getMyCalls(@AuthenticationPrincipal UserModel user) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getMyCalls(user.getId()).stream().map(this::toDTO).toList());
     }
 
     @GetMapping("/monthly")
     @PreAuthorize("hasAnyRole('TECH', 'ADMIN')")
-    public  ResponseEntity<List<CallModel>> getCallsByMonth(@AuthenticationPrincipal UserModel user, @RequestParam LocalDate beginDate, @RequestParam LocalDate lastDate) {
-        return ResponseEntity.status(HttpStatus.OK).body(callService.getAssignedCallsByMonth(user.getId(), beginDate, lastDate));
+    public  ResponseEntity<List<CallResponseDTO>> getCallsByMonth(@AuthenticationPrincipal UserModel user, @RequestParam LocalDate beginDate, @RequestParam LocalDate lastDate) {
+        return ResponseEntity.status(HttpStatus.OK).body(callService.getAssignedCallsByMonth(user.getId(), beginDate, lastDate).stream().map(this::toDTO).toList());
+    }
+
+    private CallResponseDTO toDTO(CallModel call) {
+        return new CallResponseDTO(
+                call.getId(),
+                call.getBeginDate(),
+                call.getAsset(),
+                call.getAssetsType(),
+                call.getDepartment(),
+                call.getFirstAnalysis(),
+                call.getSolution(),
+                call.getEndDate(),
+                call.getCallState(),
+                call.getCreatedBy() != null ? call.getCreatedBy().getId() : null,
+                call.getAssignedTo() != null ? call.getAssignedTo().getId() : null
+        );
     }
 }

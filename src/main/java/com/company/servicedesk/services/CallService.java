@@ -6,7 +6,6 @@ import com.company.servicedesk.dtos.FinishCallDTO;
 import com.company.servicedesk.exceptions.AlreadyFinishedCallException;
 import com.company.servicedesk.exceptions.CallNotFoundException;
 import com.company.servicedesk.exceptions.UserNotFoundException;
-import com.company.servicedesk.exceptions.UserWithNoPrivilegeException;
 import com.company.servicedesk.models.*;
 import com.company.servicedesk.repositories.CallRepository;
 import com.company.servicedesk.repositories.UserRepository;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,17 +37,6 @@ public class CallService {
         call.setFirstAnalysis(firstAnalysis);
 
         return call;
-    }
-
-    private UserModel assertHasElevatedRole(UUID userId) {
-        UserModel user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
-
-        //used EnumSet in this version for scalability
-        if (!EnumSet.of(UserRole.TECH, UserRole.ADMIN).contains(user.getRole())) {
-            throw new UserWithNoPrivilegeException("Usuário sem privilégio");
-        }
-        return user;
     }
 
     private UserModel findUserByLogin(String userLogin) {
@@ -127,12 +114,10 @@ public class CallService {
     }
 
     public List<CallModel> getAssignedCallsByMonth(UUID techId, LocalDate beginDate, LocalDate lastDate) {
-        UserModel user = assertHasElevatedRole(techId);
-        return callRepository.findByMonth(user.getId() ,beginDate, lastDate);
+        return callRepository.findByMonth(techId ,beginDate, lastDate);
     }
 
-    public List<CallModel> getAllCalls(UUID userId) {
-        assertHasElevatedRole(userId);
+    public List<CallModel> getAllCalls() {
         return callRepository.findAll();
     }
 }

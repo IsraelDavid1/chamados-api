@@ -48,7 +48,7 @@ public class CallModel implements Serializable {
     @Column(nullable = false)
     private String department;
 
-    @Column
+    @Column(nullable = false)
     private String firstAnalysis;
 
     @Column

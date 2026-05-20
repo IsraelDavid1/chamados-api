@@ -12,5 +12,5 @@ public record CreateCallDTO(@NotNull LocalDate beginDate,
                             @NotNull Assets asset,
                             @NotNull AssetsType assetType,
                             String department,
-                            String firstAnalysis) {
+                            @NotBlank String firstAnalysis) {
 }
