@@ -18,9 +18,9 @@ CREATE TABLE tb_calls(
                             first_analysis VARCHAR(255) NOT NULL,
                             solution VARCHAR(255),
                             end_date DATE,
-                            callState VARCHAR(255) NOT NULL
+                            call_state VARCHAR(255) NOT NULL
 );
 
 
 CREATE INDEX idx_calls_begin_date ON tb_calls(begin_date);
-CREATE INDEX idx_assigned_to_begin_date ON tb_expenses(assigned_to, begin_date);
+CREATE INDEX idx_assigned_to_begin_date ON tb_calls(assigned_to, begin_date);
