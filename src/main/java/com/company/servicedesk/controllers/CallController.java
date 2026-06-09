@@ -15,7 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,7 +68,7 @@ public class CallController {
 
     @GetMapping("/monthly")
     @PreAuthorize("hasAnyRole('TECH', 'ADMIN')")
-    public  ResponseEntity<List<CallResponseDTO>> getCallsByMonth(@AuthenticationPrincipal UserModel user, @RequestParam LocalDate beginDate, @RequestParam LocalDate lastDate) {
+    public  ResponseEntity<List<CallResponseDTO>> getCallsByMonth(@AuthenticationPrincipal UserModel user, @RequestParam LocalDateTime beginDate, @RequestParam LocalDateTime lastDate) {
         return ResponseEntity.status(HttpStatus.OK).body(callService.getAssignedCallsByMonth(user.getId(), beginDate, lastDate).stream().map(this::toDTO).toList());
     }
 

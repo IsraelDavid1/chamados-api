@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +24,7 @@ public class CallService {
     private final CallRepository callRepository;
     private final UserRepository userRepository;
 
-    private CallModel buildBaseCall(LocalDate beginDate, UserModel tech,
+    private CallModel buildBaseCall(LocalDateTime beginDate, UserModel tech,
                                     Assets asset, AssetsType assetType,
                                     String department, String firstAnalysis) {
         CallModel call = new CallModel();
@@ -113,7 +113,7 @@ public class CallService {
         return callRepository.findByUserId(userId);
     }
 
-    public List<CallModel> getAssignedCallsByMonth(UUID techId, LocalDate beginDate, LocalDate lastDate) {
+    public List<CallModel> getAssignedCallsByMonth(UUID techId, LocalDateTime beginDate, LocalDateTime lastDate) {
         return callRepository.findByMonth(techId ,beginDate, lastDate);
     }
 

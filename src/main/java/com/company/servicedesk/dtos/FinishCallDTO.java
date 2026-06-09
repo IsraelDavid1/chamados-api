@@ -2,8 +2,8 @@ package com.company.servicedesk.dtos;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record FinishCallDTO(String solution,
-                            @NotNull LocalDate endDate) {
+                            @NotNull LocalDateTime endDate) {
 }

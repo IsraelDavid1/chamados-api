@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -35,7 +35,7 @@ public class CallModel implements Serializable {
     private UserModel assignedTo;
 
     @Column(nullable = false)
-    private LocalDate beginDate;
+    private LocalDateTime beginDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -55,7 +55,7 @@ public class CallModel implements Serializable {
     private String solution;
 
     @Column
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

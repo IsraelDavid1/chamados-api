@@ -5,14 +5,14 @@ import com.company.servicedesk.models.AssetsType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public record CreateCompleteCallDTO(@NotNull LocalDate beginDate,
+public record CreateCompleteCallDTO(@NotNull LocalDateTime beginDate,
                                     @NotBlank String techLogin,
                                     @NotNull Assets asset,
                                     @NotNull AssetsType assetType,
                                     String department,
                                     @NotBlank String firstAnalysis,
                                     String solution,
-                                    @NotNull LocalDate endDate) {
+                                    @NotNull LocalDateTime endDate) {
 }

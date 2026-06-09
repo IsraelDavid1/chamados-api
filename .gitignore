@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment variables ###
+.env
+.env.*
+
+### Spring Boot local configs ###
+application-*.properties

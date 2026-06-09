@@ -5,9 +5,9 @@ import com.company.servicedesk.models.AssetsType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public record CreateCallDTO(@NotNull LocalDate beginDate,
+public record CreateCallDTO(@NotNull LocalDateTime beginDate,
                             @NotBlank String techLogin,
                             @NotNull Assets asset,
                             @NotNull AssetsType assetType,

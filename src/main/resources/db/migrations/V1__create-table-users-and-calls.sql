@@ -11,13 +11,13 @@ CREATE TABLE tb_calls(
                             id UUID PRIMARY KEY,
                             created_by UUID REFERENCES tb_users(id),
                             assigned_to UUID REFERENCES tb_users(id),
-                            begin_date DATE NOT NULL,
+                            begin_date TIMESTAMP NOT NULL,
                             asset VARCHAR(255) NOT NULL,
                             assets_type VARCHAR(255) NOT NULL,
                             department VARCHAR(255) NOT NULL,
                             first_analysis VARCHAR(255) NOT NULL,
                             solution VARCHAR(255),
-                            end_date DATE,
+                            end_date TIMESTAMP,
                             call_state VARCHAR(255) NOT NULL
 );
 

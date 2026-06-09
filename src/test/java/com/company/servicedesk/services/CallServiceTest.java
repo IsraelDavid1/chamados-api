@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -81,7 +82,7 @@ class CallServiceTest {
     @DisplayName("Should finish a basic call")
     void finishCallSuccess() {
         UUID callId = UUID.randomUUID();
-        LocalDate endDate = LocalDate.now();
+        LocalDateTime endDate = LocalDateTime.now();
         CallModel call = createCall();
         FinishCallDTO data = new FinishCallDTO("solved", endDate);
 
@@ -100,7 +101,7 @@ class CallServiceTest {
     @DisplayName("Should throw AlreadyFinishedCallException when call already finished")
     void finishCallFailure() {
         UUID callId = UUID.randomUUID();
-        LocalDate endDate = LocalDate.now();
+        LocalDateTime endDate = LocalDateTime.now();
         CallModel call = createCall();
         FinishCallDTO data = new FinishCallDTO("solved", endDate);
 
@@ -118,7 +119,7 @@ class CallServiceTest {
         UUID userId = UUID.randomUUID();
         CreateCallDTO data = createCallDTO();
         String solution = "solved";
-        LocalDate endDate = LocalDate.now();
+        LocalDateTime endDate = LocalDateTime.now();
         UserModel user = createUser();
         UserModel tech = createTech();
         CreateCompleteCallDTO completeData = new CreateCompleteCallDTO(data.beginDate(), data.techLogin(), data.asset(),
@@ -145,7 +146,7 @@ class CallServiceTest {
         UUID userId = UUID.randomUUID();
         CreateCallDTO data = createCallDTO();
         String solution = "solved";
-        LocalDate endDate = LocalDate.now();
+        LocalDateTime endDate = LocalDateTime.now();
         CreateCompleteCallDTO completeData = new CreateCompleteCallDTO(data.beginDate(), data.techLogin(), data.asset(),
                 data.assetType(), data.department(), data.firstAnalysis(), solution, endDate);
 
@@ -191,7 +192,7 @@ class CallServiceTest {
 
         newCall.setCreatedBy(user);
         newCall.setAssignedTo(tech);
-        newCall.setBeginDate(LocalDate.now());
+        newCall.setBeginDate(LocalDateTime.now());
         newCall.setAsset(Assets.DATA);
         newCall.setAssetsType(AssetsType.ANTIVIRUS);
         newCall.setDepartment("TI");
@@ -202,7 +203,7 @@ class CallServiceTest {
     }
 
     private CreateCallDTO createCallDTO() {
-        return new CreateCallDTO(LocalDate.now(), "tech01", Assets.DATA,
+        return new CreateCallDTO(LocalDateTime.now(), "tech01", Assets.DATA,
                 AssetsType.ANTIVIRUS, "TI", "Analise");
     }
 

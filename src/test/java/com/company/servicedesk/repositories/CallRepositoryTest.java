@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +29,11 @@ class CallRepositoryTest {
         UserModel tech = createUser();
         this.createCall(user, tech);
 
-        List<CallModel> result = callRepository.findByMonth(tech.getId(), LocalDate.now(), LocalDate.now());
+        List<CallModel> result = callRepository.findByMonth(tech.getId(), LocalDate.now()
+                .withDayOfMonth(1)
+                .atStartOfDay(), LocalDate.now()
+                .withDayOfMonth(LocalDate.now().lengthOfMonth())
+                .atTime(23, 59, 59));
 
         assertThat(result).isNotEmpty();
         assertThat(result).hasSize(1);
@@ -39,7 +44,7 @@ class CallRepositoryTest {
     @DisplayName("should fail in get calls because there is no call in date")
     void findByMonthFailure() {
         UserModel user = createUser();
-        List<CallModel> result = callRepository.findByMonth(user.getId() ,LocalDate.now(), LocalDate.now());
+        List<CallModel> result = callRepository.findByMonth(user.getId() ,LocalDateTime.now(), LocalDateTime.now());
 
         assertThat(result).isEmpty();
     }
@@ -73,13 +78,13 @@ class CallRepositoryTest {
 
         newCall.setCreatedBy(user);
         newCall.setAssignedTo(tech);
-        newCall.setBeginDate(LocalDate.now());
+        newCall.setBeginDate(LocalDateTime.now());
         newCall.setAsset(Assets.DATA);
         newCall.setAssetsType(AssetsType.ANTIVIRUS);
         newCall.setDepartment("TI");
         newCall.setFirstAnalysis("analysed");
         newCall.setSolution("solved");
-        newCall.setEndDate(LocalDate.now());
+        newCall.setEndDate(LocalDateTime.now());
         newCall.setCallState(CallState.COMPLETE);
 
         this.entityManager.persist(newCall);
