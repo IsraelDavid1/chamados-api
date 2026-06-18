@@ -119,10 +119,8 @@
 				<artifactId>dependency-check-maven</artifactId>
 				<version>12.2.2</version>
 				<configuration>
-			        <failOnError>false</failOnError>
-			    </configuration>
-				<configuration>
 					<nvdApiKeyEnvironmentVariable>NVD_API_KEY</nvdApiKeyEnvironmentVariable>
+					<failOnError>false</failOnError>
 				</configuration>
 				<executions>
 					<execution>
