@@ -22,6 +22,6 @@ jobs:
       - run: mvn clean package
 
       - name: Dependency Check
-        run: |
-          mvn dependency-check:check \
-            -DnvdApiKey=${{ secrets.NVD_API_KEY }}
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: mvn dependency-check:check
