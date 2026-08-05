@@ -67,4 +67,28 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 "INTERNAL_SERVER_ERROR", exception.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
+
+    @ExceptionHandler(CallRequestNotFoundException.class)
+    public ResponseEntity<RestErrorMessage> callRequestNotFoundHandler(CallRequestNotFoundException exception,
+                                                                       HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.NOT_FOUND,
+                "NOT_FOUND", exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(CallRequestAlreadyChangedException.class)
+    public ResponseEntity<RestErrorMessage> callRequestAlreadyChangedHandler(CallRequestAlreadyChangedException exception,
+                                                                             HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.BAD_REQUEST,
+                "BAD_REQUEST", exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(WrongCallRequestStateInputException.class)
+    public ResponseEntity<RestErrorMessage> wrongCallRequestStateInputHandler(WrongCallRequestStateInputException exception,
+                                                                              HttpServletRequest request) {
+        RestErrorMessage errorResponse = new RestErrorMessage(LocalDateTime.now(), HttpStatus.BAD_REQUEST,
+                "BAD_REQUEST", exception.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 }

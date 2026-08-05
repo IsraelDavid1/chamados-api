@@ -14,10 +14,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity(name = "Calls")
-@Table(name = "tb_calls")
+@Entity(name = "CallRequests") //plural to avoid errors with the postgres
+@Table(name = "tb_call_request")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class CallModel implements Serializable {
+public class CallRequestModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -26,39 +26,31 @@ public class CallModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "created_by")
+    @Column(nullable = false)
     private UserModel createdBy;
 
-    @ManyToOne
-    @JoinColumn(name = "assigned_to")
-    private UserModel assignedTo;
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private LocalDateTime beginDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Assets asset;
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private AssetsType assetsType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Departments department;
-
-    @Column(nullable = false)
-    private String firstAnalysis;
+    private CallRequestState requestState;
 
     @Column
-    private String solution;
+    private UserModel approvedBy;
 
     @Column
-    private LocalDateTime endDate;
+    private LocalDateTime approvedAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CallState callState = CallState.INCOMPLETE;
+    @Column
+    private UserModel deniedBy;
+
+    @Column
+    private LocalDateTime deniedAt;
+
+    @Column
+    private String observation;
 }

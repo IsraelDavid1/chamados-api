@@ -26,7 +26,7 @@ public class CallService {
 
     private CallModel buildBaseCall(LocalDateTime beginDate, UserModel tech,
                                     Assets asset, AssetsType assetType,
-                                    String department, String firstAnalysis) {
+                                    Departments department, String firstAnalysis) {
         CallModel call = new CallModel();
 
         call.setBeginDate(beginDate);

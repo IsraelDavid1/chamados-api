@@ -25,6 +25,22 @@ import java.util.UUID;
 public class CallController {
     private final CallService callService;
 
+    private CallResponseDTO toDTO(CallModel call) {
+        return new CallResponseDTO(
+                call.getId(),
+                call.getBeginDate(),
+                call.getAsset(),
+                call.getAssetsType(),
+                call.getDepartment(),
+                call.getFirstAnalysis(),
+                call.getSolution(),
+                call.getEndDate(),
+                call.getCallState(),
+                call.getCreatedBy() != null ? call.getCreatedBy().getId() : null,
+                call.getAssignedTo() != null ? call.getAssignedTo().getId() : null
+        );
+    }
+
     @PostMapping
     public ResponseEntity<CallResponseDTO> createCall(@AuthenticationPrincipal UserModel user, @RequestBody @Valid CreateCallDTO data) {
         CallModel call = callService.createCall(user.getId(), data);
@@ -44,6 +60,7 @@ public class CallController {
     }
 
     @DeleteMapping("/{callId}")
+    @PreAuthorize("hasAnyRole('TECH', 'ADMIN')")
     public ResponseEntity<Void> deleteCall(@PathVariable UUID callId) {
         callService.deleteCall(callId);
         return ResponseEntity.noContent().build();
@@ -70,21 +87,5 @@ public class CallController {
     @PreAuthorize("hasAnyRole('TECH', 'ADMIN')")
     public  ResponseEntity<List<CallResponseDTO>> getCallsByMonth(@AuthenticationPrincipal UserModel user, @RequestParam LocalDateTime beginDate, @RequestParam LocalDateTime lastDate) {
         return ResponseEntity.status(HttpStatus.OK).body(callService.getAssignedCallsByMonth(user.getId(), beginDate, lastDate).stream().map(this::toDTO).toList());
-    }
-
-    private CallResponseDTO toDTO(CallModel call) {
-        return new CallResponseDTO(
-                call.getId(),
-                call.getBeginDate(),
-                call.getAsset(),
-                call.getAssetsType(),
-                call.getDepartment(),
-                call.getFirstAnalysis(),
-                call.getSolution(),
-                call.getEndDate(),
-                call.getCallState(),
-                call.getCreatedBy() != null ? call.getCreatedBy().getId() : null,
-                call.getAssignedTo() != null ? call.getAssignedTo().getId() : null
-        );
     }
 }

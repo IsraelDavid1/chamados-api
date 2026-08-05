@@ -45,7 +45,7 @@ public class AuthenticationController {
     @GetMapping("/validate")
     public ResponseEntity<UserResponseDTO> validateSession(@AuthenticationPrincipal UserModel user) {
         return ResponseEntity.ok(new UserResponseDTO(
-                user.getId(), user.getLogin(), user.getDepartment(), user.getRole()
+                user.getId(), user.getLogin(), user.getDepartment() , user.getRole()
         ));
     }
 }
