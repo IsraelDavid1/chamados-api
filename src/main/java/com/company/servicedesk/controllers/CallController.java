@@ -1,9 +1,6 @@
 package com.company.servicedesk.controllers;
 
-import com.company.servicedesk.dtos.CallResponseDTO;
-import com.company.servicedesk.dtos.CreateCallDTO;
-import com.company.servicedesk.dtos.CreateCompleteCallDTO;
-import com.company.servicedesk.dtos.FinishCallDTO;
+import com.company.servicedesk.dtos.*;
 import com.company.servicedesk.models.CallModel;
 import com.company.servicedesk.models.UserModel;
 import com.company.servicedesk.services.CallService;
@@ -37,7 +34,9 @@ public class CallController {
                 call.getEndDate(),
                 call.getCallState(),
                 call.getCreatedBy() != null ? call.getCreatedBy().getId() : null,
-                call.getAssignedTo() != null ? call.getAssignedTo().getId() : null
+                call.getAssignedTo() != null ? call.getAssignedTo().getId() : null,
+                call.getUrgency(),
+                call.getImpact()
         );
     }
 
@@ -68,7 +67,7 @@ public class CallController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('TECH', 'ADMIN')")
-    public  ResponseEntity<List<CallResponseDTO>> getAllCalls(@AuthenticationPrincipal UserModel user) {
+    public  ResponseEntity<List<CallResponseDTO>> getAllCalls() {
         return ResponseEntity.status(HttpStatus.OK).body(callService.getAllCalls().stream().map(this::toDTO).toList());
     }
 
@@ -87,5 +86,12 @@ public class CallController {
     @PreAuthorize("hasAnyRole('TECH', 'ADMIN')")
     public  ResponseEntity<List<CallResponseDTO>> getCallsByMonth(@AuthenticationPrincipal UserModel user, @RequestParam LocalDateTime beginDate, @RequestParam LocalDateTime lastDate) {
         return ResponseEntity.status(HttpStatus.OK).body(callService.getAssignedCallsByMonth(user.getId(), beginDate, lastDate).stream().map(this::toDTO).toList());
+    }
+
+    @PatchMapping("/{callId}")
+    @PreAuthorize("hasAnyRole('TECH', 'ADMIN')")
+    public ResponseEntity<CallResponseDTO> updateCall(@PathVariable UUID callId, @RequestBody @Valid UpdateCallRequest data) {
+        CallModel call = callService.updateCall(callId, data);
+        return ResponseEntity.status(HttpStatus.OK).body(toDTO(call));
     }
 }

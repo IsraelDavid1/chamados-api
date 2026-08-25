@@ -61,4 +61,12 @@ public class CallModel implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CallState callState = CallState.INCOMPLETE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Urgency urgency = Urgency.LOW;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Impact impact = Impact.LOW;
 }

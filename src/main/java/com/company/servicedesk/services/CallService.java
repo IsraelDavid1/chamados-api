@@ -3,6 +3,7 @@ package com.company.servicedesk.services;
 import com.company.servicedesk.dtos.CreateCallDTO;
 import com.company.servicedesk.dtos.CreateCompleteCallDTO;
 import com.company.servicedesk.dtos.FinishCallDTO;
+import com.company.servicedesk.dtos.UpdateCallRequest;
 import com.company.servicedesk.exceptions.AlreadyFinishedCallException;
 import com.company.servicedesk.exceptions.CallNotFoundException;
 import com.company.servicedesk.exceptions.UserNotFoundException;
@@ -26,7 +27,8 @@ public class CallService {
 
     private CallModel buildBaseCall(LocalDateTime beginDate, UserModel tech,
                                     Assets asset, AssetsType assetType,
-                                    Departments department, String firstAnalysis) {
+                                    Departments department, String firstAnalysis,
+                                    Urgency urgency, Impact impact) {
         CallModel call = new CallModel();
 
         call.setBeginDate(beginDate);
@@ -35,6 +37,8 @@ public class CallService {
         call.setAssetsType(assetType);
         call.setDepartment(department);
         call.setFirstAnalysis(firstAnalysis);
+        call.setUrgency(urgency != null ? urgency : Urgency.LOW);
+        call.setImpact(impact != null ? impact : Impact.LOW);
 
         return call;
     }
@@ -58,7 +62,8 @@ public class CallService {
     public CallModel createCall(UUID userId, CreateCallDTO data) {
         UserModel tech = findUserByLogin(data.techLogin());
         CallModel call = buildBaseCall(data.beginDate(), tech, data.asset(),
-                data.assetType(), data.department(), data.firstAnalysis());
+                data.assetType(), data.department(), data.firstAnalysis(),
+                data.urgency(), data.impact());
 
         UserModel user = findUserById(userId);
 
@@ -86,7 +91,8 @@ public class CallService {
     public CallModel createFinishedCall(UUID userId, CreateCompleteCallDTO data){
         UserModel tech = findUserByLogin(data.techLogin());
         CallModel call = buildBaseCall(data.beginDate(), tech, data.asset(),
-                data.assetType(), data.department(), data.firstAnalysis());
+                data.assetType(), data.department(), data.firstAnalysis(),
+                data.urgency(), data.impact());
 
         UserModel user = findUserById(userId);
 
@@ -119,5 +125,20 @@ public class CallService {
 
     public List<CallModel> getAllCalls() {
         return callRepository.findAll();
+    }
+
+    //when grows enough, update to utilise mapstruct
+    public CallModel updateCall(UUID callId, UpdateCallRequest data) {
+        CallModel call = findCallById(callId);
+
+        if (data.beginDate() != null) { call.setBeginDate(data.beginDate()); }
+        if (data.departments() != null) { call.setDepartment(data.departments()); }
+        if (data.firstAnalyses() != null) { call.setFirstAnalysis(data.firstAnalyses()); }
+        if (data.solution() != null) { call.setSolution(data.solution()); }
+        if (data.urgency() != null) { call.setUrgency(data.urgency()); }
+        if (data.impact() != null) { call.setImpact(data.impact()); }
+
+
+        return callRepository.save(call);
     }
 }

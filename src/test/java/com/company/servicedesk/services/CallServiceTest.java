@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -122,8 +121,10 @@ class CallServiceTest {
         LocalDateTime endDate = LocalDateTime.now();
         UserModel user = createUser();
         UserModel tech = createTech();
-        CreateCompleteCallDTO completeData = new CreateCompleteCallDTO(data.beginDate(), data.techLogin(), data.asset(),
-                data.assetType(), data.department(), data.firstAnalysis(), solution, endDate);
+        CreateCompleteCallDTO completeData = new CreateCompleteCallDTO(
+                data.beginDate(), data.techLogin(), data.asset(),
+                data.assetType(), data.department(), data.firstAnalysis(),
+                solution, endDate, data.urgency(), data.impact());
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.findByLogin("tech01")).thenReturn(Optional.of(tech));
@@ -147,8 +148,10 @@ class CallServiceTest {
         CreateCallDTO data = createCallDTO();
         String solution = "solved";
         LocalDateTime endDate = LocalDateTime.now();
-        CreateCompleteCallDTO completeData = new CreateCompleteCallDTO(data.beginDate(), data.techLogin(), data.asset(),
-                data.assetType(), data.department(), data.firstAnalysis(), solution, endDate);
+        CreateCompleteCallDTO completeData = new CreateCompleteCallDTO(
+                data.beginDate(),data.techLogin(), data.asset(),
+                data.assetType(), data.department(), data.firstAnalysis(),
+                solution, endDate, data.urgency(), data.impact());
 
         when(userRepository.findByLogin("tech01")).thenReturn(Optional.empty());
 
@@ -195,7 +198,7 @@ class CallServiceTest {
         newCall.setBeginDate(LocalDateTime.now());
         newCall.setAsset(Assets.DATA);
         newCall.setAssetsType(AssetsType.ANTIVIRUS);
-        newCall.setDepartment("TI");
+        newCall.setDepartment(Departments.IT);
         newCall.setFirstAnalysis("analysed");
         newCall.setCallState(CallState.INCOMPLETE);
 
@@ -204,7 +207,8 @@ class CallServiceTest {
 
     private CreateCallDTO createCallDTO() {
         return new CreateCallDTO(LocalDateTime.now(), "tech01", Assets.DATA,
-                AssetsType.ANTIVIRUS, "TI", "Analise");
+                AssetsType.ANTIVIRUS, Departments.IT, "Analise",
+                Urgency.LOW, Impact.LOW);
     }
 
     private UserModel createUser() {

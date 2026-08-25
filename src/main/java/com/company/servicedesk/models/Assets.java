@@ -7,8 +7,19 @@ public enum Assets {
     HARDWARE("hardware"),
     SOFTWARE("software"),
     CLOUD("cloud"),
-    INTERNET("internet"),
-    DATA("data");
+    NETWORK("network"),
+    DATA("data"),
+    DATABASE("database"),
+    SERVER("server"),
+    ACCOUNT("account"),
+    IDENTITY("identity"),
+    EMAIL("email"),
+    SECURITY("security"),
+    BACKUP("backup"),
+    TELEPHONY("telephony"),
+    PRINTING("printing"),
+    APPLICATION("application"),
+    OTHER("other");
 
     private final String asset;
 

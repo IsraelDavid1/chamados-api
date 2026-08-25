@@ -1,8 +1,6 @@
 package com.company.servicedesk.dtos;
 
-import com.company.servicedesk.models.Assets;
-import com.company.servicedesk.models.AssetsType;
-import com.company.servicedesk.models.Departments;
+import com.company.servicedesk.models.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,5 +11,7 @@ public record CreateCallDTO(@NotNull LocalDateTime beginDate,
                             @NotNull Assets asset,
                             @NotNull AssetsType assetType,
                             Departments department,
-                            @NotBlank String firstAnalysis) {
+                            @NotBlank String firstAnalysis,
+                            Urgency urgency,
+                            Impact impact) {
 }

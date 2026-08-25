@@ -38,7 +38,7 @@ public class AuthorizationService implements UserDetailsService {
         UserModel newUser = new UserModel();
         newUser.setLogin(data.userLogin());
         newUser.setPassword(passwordEncoder.encode(data.password()));
-        newUser.setDepartment(data.departament());
+        newUser.setDepartment(data.department());
         newUser.setRole(UserRole.USER);
 
         userRepository.save(newUser);
