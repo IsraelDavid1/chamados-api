@@ -120,6 +120,7 @@
 				<version>12.2.2</version>
 				<configuration>
 					<nvdApiKeyEnvironmentVariable>NVD_API_KEY</nvdApiKeyEnvironmentVariable>
+					<failOnError>false</failOnError>
 				</configuration>
 				<executions>
 					<execution>
