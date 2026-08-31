@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum AssetsType {
     DESKTOP("desktop"),
     NOTEBOOK("notebook"),
+    CAMERA("camera"),
     MONITOR("monitor"),
     PRINTER("printer"),
     SCANNER("scanner"),

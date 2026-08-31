@@ -128,6 +128,7 @@ public class CallService {
     }
 
     //when grows enough, update to utilise mapstruct
+    @Transactional
     public CallModel updateCall(UUID callId, UpdateCallRequest data) {
         CallModel call = findCallById(callId);
 

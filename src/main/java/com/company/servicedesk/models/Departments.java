@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum Departments {
+    ARCHIVES("archives"),
     CLEANING("cleaning"),
     CONTRACTS("contracts"),
     DIRECTORSHIP("directorship"),

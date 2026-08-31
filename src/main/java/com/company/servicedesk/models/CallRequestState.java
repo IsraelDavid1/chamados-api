@@ -11,5 +11,4 @@ public enum CallRequestState {
     private final String callRequestState;
 
     CallRequestState(String callRequestState) { this.callRequestState = callRequestState; }
-
 }

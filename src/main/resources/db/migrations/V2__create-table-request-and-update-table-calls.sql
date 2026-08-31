@@ -2,7 +2,7 @@ ALTER TABLE tb_calls
     ALTER COLUMN solution TYPE TEXT,
     ALTER COLUMN first_analysis TYPE TEXT,
     ADD COLUMN urgency VARCHAR(20) DEFAULT 'LOW' NOT NULL CHECK ( urgency IN ( 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL')),
-    ADD COLUMN impact VARCHAR(20) DEFAULT 'LOW' NOT NULL CHECK ( urgency IN ( 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'));
+    ADD COLUMN impact VARCHAR(20) DEFAULT 'LOW' NOT NULL CHECK ( Impact IN ( 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'));
 
 
 CREATE TABLE tb_call_request(
